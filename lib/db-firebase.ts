@@ -286,7 +286,7 @@ export async function getUserPins(userId: string): Promise<Pin[]> {
     })
     
     // Sort by createdAt desc if not already sorted
-    return pins.sort((a, b) => 
+    return pins.sort((a: Pin, b: Pin) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
   } catch (error) {
@@ -365,8 +365,13 @@ export async function getPinComments(pinId: string): Promise<Comment[]> {
       orderBy('createdAt', 'desc')
     )
     const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map(doc => {
-      const data = doc.data()
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data() as {
+        pinId: string
+        userId: string
+        text: string
+        createdAt?: Timestamp
+      }
       return {
         id: doc.id,
         pinId: data.pinId,
@@ -527,8 +532,17 @@ export async function getUserNotifications(userId: string): Promise<Notification
       querySnapshot = await getDocs(q)
     }
     
-    const notifications = querySnapshot.docs.map(doc => {
-      const data = doc.data()
+    const notifications = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data() as {
+        userId: string
+        type: "like" | "comment" | "follow" | "mention"
+        fromUserId: string
+        pinId?: string
+        commentId?: string
+        text?: string
+        read?: boolean
+        createdAt?: Timestamp
+      }
       return {
         id: doc.id,
         userId: data.userId,
@@ -543,7 +557,7 @@ export async function getUserNotifications(userId: string): Promise<Notification
     })
     
     // Sort by createdAt desc if not already sorted
-    return notifications.sort((a, b) => 
+    return notifications.sort((a: Notification, b: Notification) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
   } catch (error) {
@@ -586,7 +600,7 @@ export async function markAllNotificationsAsRead(userId: string): Promise<void> 
     const querySnapshot = await getDocs(q)
     const batch = writeBatch(db)
     
-    querySnapshot.docs.forEach(doc => {
+    querySnapshot.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
       batch.update(doc.ref, { read: true })
     })
     
@@ -632,8 +646,14 @@ export async function getUserCollections(userId: string): Promise<Collection[]> 
       orderBy('createdAt', 'desc')
     )
     const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map(doc => {
-      const data = doc.data()
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data() as {
+        userId: string
+        name: string
+        description?: string
+        pinIds?: string[]
+        createdAt?: Timestamp
+      }
       return {
         id: doc.id,
         userId: data.userId,
@@ -757,18 +777,18 @@ export async function searchPins(queryText: string, category?: string, tags?: st
     // Filter by search query
     if (queryText) {
       const lowerQuery = queryText.toLowerCase()
-      pins = pins.filter(pin => 
+      pins = pins.filter((pin: Pin) => 
         pin.title.toLowerCase().includes(lowerQuery) ||
         pin.description.toLowerCase().includes(lowerQuery) ||
         pin.category.toLowerCase().includes(lowerQuery) ||
-        (pin.tags && pin.tags.some(tag => tag.toLowerCase().includes(lowerQuery)))
+        (pin.tags && pin.tags.some((tag: string) => tag.toLowerCase().includes(lowerQuery)))
       )
     }
     
     // Filter by tags
     if (tags && tags.length > 0) {
-      pins = pins.filter(pin => 
-        pin.tags && tags.some(tag => pin.tags!.includes(tag))
+      pins = pins.filter((pin: Pin) => 
+        pin.tags && tags.some((tag: string) => pin.tags!.includes(tag))
       )
     }
     
@@ -785,8 +805,17 @@ export async function getTrendingPins(limitCount: number = 20): Promise<Pin[]> {
     // Get all pins and sort by likes and recency (can't use multiple orderBy without composite index)
     const q = query(collection(db, 'pins'), orderBy('likes', 'desc'), limit(limitCount * 2))
     const querySnapshot = await getDocs(q)
-    const pins = querySnapshot.docs.map(doc => {
-      const data = doc.data()
+    const pins = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data() as {
+        userId: string
+        title: string
+        description: string
+        image: string
+        category: "illustration" | "design" | "photography" | "concept-art" | "drawing"
+        tags?: string[]
+        likes?: number
+        createdAt?: Timestamp
+      }
       return {
         id: doc.id,
         userId: data.userId,
