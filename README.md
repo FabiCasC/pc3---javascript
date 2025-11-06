@@ -11,7 +11,7 @@ Una aplicación web para que artistas, diseñadores y creadores compartan su tra
 - **React Router** - Enrutamiento de la aplicación
 - **shadcn/ui** - Componentes de UI basados en Radix UI
 
-## Instalación
+## Instalaciones
 
 1. Instala las dependencias:
 ```bash
