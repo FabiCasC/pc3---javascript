@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { type User, loginWithEmail } from "@/lib/auth"
+import { loginWithEmail } from "@/lib/auth"
 import { AlertTriangle, ArrowLeft } from "lucide-react"
 
 export default function LoginPage() {
@@ -22,7 +22,7 @@ export default function LoginPage() {
     }
 
     try {
-      const user = await loginWithEmail(email, password)
+      await loginWithEmail(email, password)
       // Redirigir al home después del login exitoso
       navigate("/")
       // Recargar para actualizar el estado

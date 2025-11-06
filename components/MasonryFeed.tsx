@@ -9,10 +9,6 @@ interface MasonryFeedProps {
 }
 
 export function MasonryFeed({ pins, users, onRefresh }: MasonryFeedProps) {
-  const getUserById = useCallback((userId: string) => {
-    return users.find((u) => u.id === userId)
-  }, [users])
-
   const handleLikeUpdate = useCallback(() => {
     // Just call the refresh callback, don't reload everything
     onRefresh?.()

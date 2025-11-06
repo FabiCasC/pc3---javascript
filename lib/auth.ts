@@ -7,8 +7,8 @@ import {
   User as FirebaseUser,
   updateProfile
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
-import { auth, db } from '../src/lib/firebase'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { auth, db } from '@/src/lib/firebase'
 
 export type User = {
   id: string
@@ -90,7 +90,7 @@ export function getCurrentUserSync(): User | null {
 }
 
 // Establecer usuario actual (ya no necesario con Firebase, pero mantenemos para compatibilidad)
-export function setCurrentUser(user: User): void {
+export function setCurrentUser(_user: User): void {
   // Firebase maneja esto automáticamente
   // Esta función se mantiene para compatibilidad pero no hace nada
 }

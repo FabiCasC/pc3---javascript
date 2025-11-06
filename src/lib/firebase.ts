@@ -2,7 +2,6 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app'
 import { getAuth, type Auth } from 'firebase/auth'
 import { getFirestore, type Firestore } from 'firebase/firestore'
-import { getStorage, type FirebaseStorage } from 'firebase/storage'
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -18,22 +17,19 @@ const firebaseConfig = {
 let app: FirebaseApp
 let auth: Auth
 let db: Firestore
-let storage: FirebaseStorage
 
 if (getApps().length === 0) {
   // Si no hay apps inicializadas, crear una nueva
   app = initializeApp(firebaseConfig)
   auth = getAuth(app)
   db = getFirestore(app)
-  storage = getStorage(app)
 } else {
   // Si ya hay una app inicializada, usar la existente
   app = getApps()[0]
   auth = getAuth(app)
   db = getFirestore(app)
-  storage = getStorage(app)
 }
 
-export { auth, db, storage }
+export { auth, db }
 export default app
 

@@ -21,7 +21,7 @@ export function UploadModal({ isOpen, onClose, onUpload, userId }: UploadModalPr
   )
   const [tags, setTags] = useState("")
   const [imageUrl, setImageUrl] = useState("")
-  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [, setImageFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string>("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)

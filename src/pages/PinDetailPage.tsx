@@ -19,7 +19,6 @@ export default function PinDetailPage() {
   const [likes, setLikes] = useState(0)
   const [isLiked, setIsLiked] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [isSaved, setIsSaved] = useState(false)
 
   useEffect(() => {
     const loadUser = async () => {

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { getUserCollections, createCollection, addPinToCollection, removePinFromCollection } from "@/lib/db"
 import { getCurrentUser } from "@/lib/auth"
-import type { Collection } from "@/lib/db"
+import type { Collection, User } from "@/lib/db"
 import { Bookmark, Plus, X } from "lucide-react"
 
 interface SaveToCollectionProps {

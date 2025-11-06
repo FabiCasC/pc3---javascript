@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { updateUserProfile } from "@/lib/db"
-import { getCurrentUser, setCurrentUser } from "@/lib/auth"
+import { getCurrentUser } from "@/lib/auth"
 import type { User } from "@/lib/auth"
 import { Edit2, User as UserIcon } from "lucide-react"
 
@@ -86,7 +86,7 @@ export function EditProfileModal({ onUpdate }: EditProfileModalProps) {
       console.log("Profile updated:", updatedUser)
 
       if (updatedUser) {
-        setCurrentUser(updatedUser)
+        // User updated, state will be refreshed on next render
         setIsOpen(false)
         onUpdate?.()
       } else {

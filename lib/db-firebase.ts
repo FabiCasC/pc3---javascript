@@ -1,11 +1,11 @@
 // Base de datos con Firestore
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  setDoc, 
-  updateDoc, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
   deleteDoc,
   query,
   where,
@@ -14,9 +14,10 @@ import {
   addDoc,
   Timestamp,
   writeBatch,
-  onSnapshot
+  type QueryDocumentSnapshot,
+  type DocumentData
 } from 'firebase/firestore'
-import { db } from '../src/lib/firebase'
+import { db } from '@/src/lib/firebase'
 import type { User } from '@/lib/auth'
 
 // Re-export User type for convenience
@@ -74,10 +75,6 @@ function timestampToString(timestamp: any): string {
   return timestamp || new Date().toISOString().split('T')[0]
 }
 
-// Helper para convertir string a Firestore Timestamp
-function stringToTimestamp(dateString: string): Timestamp {
-  return Timestamp.fromDate(new Date(dateString))
-}
 
 // ===== USERS =====
 export async function getUserById(userId: string): Promise<User | null> {
@@ -733,8 +730,17 @@ export async function searchPins(queryText: string, category?: string, tags?: st
     }
     
     const querySnapshot = await getDocs(q)
-    let pins = querySnapshot.docs.map(doc => {
-      const data = doc.data()
+    let pins = querySnapshot.docs.map((doc) => {
+      const data = doc.data() as {
+        userId: string
+        title: string
+        description: string
+        image: string
+        category: "illustration" | "design" | "photography" | "concept-art" | "drawing"
+        tags?: string[]
+        likes?: number
+        createdAt?: Timestamp
+      }
       return {
         id: doc.id,
         userId: data.userId,
@@ -796,7 +802,7 @@ export async function getTrendingPins(limitCount: number = 20): Promise<Pin[]> {
     
     // Sort by a combination of likes and recency
     return pins
-      .sort((a, b) => {
+      .sort((a: Pin, b: Pin) => {
         const aScore = a.likes * 2 + (new Date().getTime() - new Date(a.createdAt).getTime()) / (1000 * 60 * 60 * 24)
         const bScore = b.likes * 2 + (new Date().getTime() - new Date(b.createdAt).getTime()) / (1000 * 60 * 60 * 24)
         return bScore - aScore
@@ -808,7 +814,7 @@ export async function getTrendingPins(limitCount: number = 20): Promise<Pin[]> {
     try {
       const q = query(collection(db, 'pins'), orderBy('createdAt', 'desc'), limit(limitCount))
       const querySnapshot = await getDocs(q)
-      return querySnapshot.docs.map(doc => {
+      return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
         const data = doc.data()
         return {
           id: doc.id,
@@ -834,7 +840,7 @@ export async function getAllTags(): Promise<string[]> {
   try {
     const querySnapshot = await getDocs(collection(db, 'pins'))
     const tagsSet = new Set<string>()
-    querySnapshot.docs.forEach(doc => {
+    querySnapshot.docs.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
       const tags = doc.data().tags || []
       tags.forEach((tag: string) => tagsSet.add(tag))
     })
@@ -888,7 +894,7 @@ export async function getDatabase(): Promise<{ users: User[], pins: Pin[], comme
     
     // Get follows
     const followsSnapshot = await getDocs(collection(db, 'follows'))
-    const follows = followsSnapshot.docs.map(doc => doc.data())
+    const follows = followsSnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => doc.data())
     
     return {
       users,
@@ -914,7 +920,7 @@ export async function getDatabase(): Promise<{ users: User[], pins: Pin[], comme
 async function getAllComments(): Promise<Comment[]> {
   try {
     const querySnapshot = await getDocs(collection(db, 'comments'))
-    return querySnapshot.docs.map(doc => {
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
       const data = doc.data()
       return {
         id: doc.id,
@@ -933,7 +939,7 @@ async function getAllComments(): Promise<Comment[]> {
 async function getAllNotifications(): Promise<Notification[]> {
   try {
     const querySnapshot = await getDocs(collection(db, 'notifications'))
-    return querySnapshot.docs.map(doc => {
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
       const data = doc.data()
       return {
         id: doc.id,
@@ -956,7 +962,7 @@ async function getAllNotifications(): Promise<Notification[]> {
 async function getAllCollections(): Promise<Collection[]> {
   try {
     const querySnapshot = await getDocs(collection(db, 'collections'))
-    return querySnapshot.docs.map(doc => {
+    return querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
       const data = doc.data()
       return {
         id: doc.id,
